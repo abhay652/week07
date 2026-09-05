@@ -1,7 +1,11 @@
 name: CI Pipeline
 
+# 7.1P change: the original workflow only had workflow_dispatch, so a code push
+# could never trigger it. Adding the push trigger satisfies step 4 of the task.
 on:
-  # Manual trigger for the workflow
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 
@@ -77,11 +81,13 @@ jobs:
 
     steps:
 
+      # 7.1P Node 20 fix: v4 runs on the deprecated node20 runtime, v5 runs on node24.
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
+      # 7.1P Node 20 fix: setup-python v5 runs on node20, v6 runs on node24.
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -100,7 +106,7 @@ jobs:
   # =========================================================
   # Build and Push Docker Images
   # =========================================================
-  build-and-push:
+  build_and_push_images:
     name: Build and Push ${{ matrix.image }}
     runs-on: ubuntu-latest
 
@@ -136,11 +142,13 @@ jobs:
 
     steps:
 
+      # 7.1P Node 20 fix
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
+      # 7.1P Node 20 fix: azure/login v2 runs on node20, v3 runs on node24.
       - name: Login to Azure
-        uses: azure/login@v2
+        uses: azure/login@v3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
